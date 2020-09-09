@@ -2,6 +2,11 @@
 #include <vector>
 #include <iterator>
 
+#define PATH                  0
+#define WALL                  1
+#define SALESMAN_1_TRAIL      2
+#define SALESMAN_2_TRAIL      3
+
 using namespace std;
 
 struct cell{
@@ -12,53 +17,44 @@ struct cell{
 
 class bfs_tree{
 public:
-    bfs_tree(int **map, int X, int Y, cell start1, cell start2){
+    bfs_tree(int **map, int X, int Y, cell start, cell destination){
         this->map = map;
         this->X = X;
         this->Y = Y;
-        this->start1 = start1;
-        this->start2 = start2;
+        this->start = start;
+        this->destination = destination;
+        map[ start.y ][start.x] = SALESMAN_1_TRAIL;
+        map[ destination.y ][ destination.x ] = SALESMAN_2_TRAIL;
     }
 
-    void two_way_bfs(cell curr_cell1, cell curr_cell2){
+    void optimized_bfs(){
 
-        int x1 = curr_cell1.x;
-        int y1 = curr_cell1.y;
-        int x2 = curr_cell2.x;
-        int y2 = curr_cell2.y;
+        int x1 = start.x;
+        int y1 = start.y;
+        int x2 = destination.x;
+        int y2 = destination.y;
 
-        rob1.push_back(curr_cell1);
-        rob2.push_back(curr_cell2);
+        bfs_queue.push_back(start);
 
         int ret1=-1;
         int ret2=-1;
 
-        while ( rob1.empty() == false && rob2.empty() == false ){
+        while ( bfs_queue.empty() == false ){
         	
         	cout << "stack 1 :";
-        	for (auto i: rob1){
-        		cout << i.x  << " " << i.y << endl;
-			}
-			cout << endl;
-			cout << "stack 2 :";
-        	for (auto i: rob2){
+        	for (auto i: bfs_queue){
         		cout << i.x  << " " << i.y << endl;
 			}
 			cout << endl;
             
-            ret1 = push_to_bfs_stack(rob1, rob1[0], 2, 3);
+            ret1 = push_neighbours_to_bfs_stack(bfs_queue, bfs_queue[0]);
             if (ret1 != -1){
                 cout << "Answer :" << ret1 << endl;
                 break;
             }
-            ret2 = push_to_bfs_stack(rob2, rob2[0], 3, 2);
-            if (ret2 != -1){
-                cout << "Answer :" << ret2 << endl;
-                break;
-            }
+            
 
-            rob1.erase( rob1.begin() );
-            rob2.erase( rob2.begin() );
+            bfs_queue.erase( bfs_queue.begin() );
 
         }
 
@@ -71,21 +67,21 @@ public:
 
     }
 
-    int push_to_bfs_stack( vector<cell>& stck, cell _cell , int rob_no, int opp_rob_no){
+    int push_neighbours_to_bfs_stack( vector<cell>& stck, cell _cell){
         cell tmp;
         int ret=-1;
         int x = _cell.x;
         int y = _cell.y;
         do{
             if ( y - 1 >= 0 ){
-                if ( map[ y-1 ][x] != 1 ){
-                    if ( map[y-1][x] == 0 ){
+                if ( map[ y-1 ][x] != WALL ){
+                    if ( map[y-1][x] == PATH ){
                         tmp.x = x;
                         tmp.y = y-1;
                         tmp.time = _cell.time + 1;
                         stck.push_back(tmp);
-                        map[y-1][x] = rob_no;
-                    }else if ( map [y-1][x] == opp_rob_no){
+                        map[y-1][x] = SALESMAN_1_TRAIL;
+                    }else if ( map [y-1][x] == SALESMAN_2_TRAIL){
                         cout << "Soulution found" << endl;
                         ret = _cell.time + 1;
                         break;
@@ -93,14 +89,14 @@ public:
                 }
             }
             if ( x - 1 >=0 ){
-                if ( map[ y ][x-1] != 1 ){
-                    if ( map[y][x-1] == 0 ){
+                if ( map[ y ][x-1] != WALL ){
+                    if ( map[y][x-1] == PATH ){
                         tmp.x = x-1;
                         tmp.y = y;
                         tmp.time = _cell.time + 1;
                         stck.push_back(tmp);
-                        map[y][x-1] = rob_no;
-                    }else if ( map [y][x-1] == opp_rob_no){
+                        map[y][x-1] = SALESMAN_1_TRAIL;
+                    }else if ( map [y][x-1] == SALESMAN_2_TRAIL){
                         cout << "Soulution found" << endl;
                         ret = _cell.time + 1;
                         break;
@@ -109,14 +105,14 @@ public:
                 
             }
             if ( y + 1 <= Y-1){
-                if ( map[ y+1 ][x] != 1 ){
-                    if ( map[y+1][x] == 0 ){
+                if ( map[ y+1 ][x] != WALL ){
+                    if ( map[y+1][x] == PATH ){
                         tmp.x = x;
                         tmp.y = y+1;
                         tmp.time = _cell.time + 1;
                         stck.push_back(tmp);
-                        map[y+1][x] = rob_no;
-                    }else if ( map [y+1][x] == opp_rob_no){
+                        map[y+1][x] = SALESMAN_1_TRAIL;
+                    }else if ( map [y+1][x] == SALESMAN_2_TRAIL){
                         cout << "Soulution found" << endl;
                         ret = _cell.time + 1;
                         break;
@@ -124,14 +120,14 @@ public:
                 }
             }
             if ( x + 1 <= X-1 ){
-                if ( map[ y ][x+1] != 1 ){
-                    if ( map[y][x+1] == 0 ){
+                if ( map[ y ][x+1] != WALL ){
+                    if ( map[y][x+1] == PATH ){
                         tmp.x = x+1;
                         tmp.y = y;
                         tmp.time = _cell.time + 1;
                         stck.push_back(tmp);
-                        map[y][x+1] = rob_no;
-                    }else if ( map [y][x+1] == opp_rob_no){
+                        map[y][x+1] = SALESMAN_1_TRAIL;
+                    }else if ( map [y][x+1] == SALESMAN_2_TRAIL){
                         cout << "Soulution found" << endl;
                         ret = _cell.time + 1;
                         break;
@@ -142,17 +138,14 @@ public:
         return ret;
     }
 
-
-
     int **map;
     int X;
     int Y;
 
-    cell start1;
-    cell start2;
+    cell start;
+    cell destination;
 
-    vector<cell>rob1;
-    vector<cell>rob2;
+    vector<cell>bfs_queue;
 
 };
 
@@ -186,13 +179,13 @@ int main(){
     rob1.y = 0;
     rob1.time = 0;
 
-    cell rob2;
+	cell rob2;
     rob2.x = M-1;
     rob2.y = N-1;
     rob2.time = 0;
-
+    
 	bfs_tree b1 (map, M, N, rob1, rob2);
-	b1.two_way_bfs(rob1, rob2);
+	b1.optimized_bfs();
 
     return 0;
 
