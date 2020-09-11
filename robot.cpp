@@ -2,10 +2,11 @@
 #include <vector>
 #include <iterator>
 
-#define PATH                  0
-#define WALL                  1
-#define SALESMAN_1_TRAIL      2
-#define SALESMAN_2_TRAIL      3
+#define PATH                  '0'
+#define WALL                  'X'
+#define SALESMAN_1_TRAIL      '.'
+#define SALESMAN_2_TRAIL      'T'
+#define SHORTEST_PATH         '1'
 
 using namespace std;
 
@@ -13,12 +14,11 @@ struct cell{
     int x;
     int y;
     unsigned int time=0;
-    cell * parent = nullptr;
 };
 
 class bfs_tree{
 public:
-    bfs_tree(int **map, int X, int Y, cell start, cell destination){
+    bfs_tree(char **map, int X, int Y, cell start, cell destination){
         this->map = map;
         this->X = X;
         this->Y = Y;
@@ -94,7 +94,7 @@ public:
         int p = destination.x;
         int q = destination.y;
         while(true){
-            cout << "p = " << p << " q = " << q << endl;
+            //cout << "p = " << p << " q = " << q << endl;
             if ( map_of_parents[q][p] == 0 ){
                 break;
             }else{
@@ -119,7 +119,7 @@ public:
         int x = _cell.x;
         int y = _cell.y;
 
-        cout << "cell: (" << y << "," << x << ")" << endl;
+        //cout << "cell: (" << y << "," << x << ")" << endl;
         do{
             if ( y - 1 >= 0 ){
                 if ( map[ y-1 ][x] != WALL ){
@@ -194,7 +194,7 @@ public:
         return ret;
     }
 
-    int **map;
+    char **map;
     int **map_of_parents;
     int X;
     int Y;
@@ -212,10 +212,10 @@ int main(){
 	int N, M;
 	cin >> N >> M;
 
-	int **map;
-	map = new int* [N];
+	char **map;
+	map = new char* [N];
 	for (int i=0; i<N; i++){
-		map[i] = new int[M];
+		map[i] = new char[M];
 	}
 	
 	for (int i=0; i<N; i++){
