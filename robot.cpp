@@ -6,7 +6,7 @@
 #define WALL                  'X'
 #define SALESMAN_1_TRAIL      '.'
 #define SALESMAN_2_TRAIL      'T'
-#define SHORTEST_PATH         '1'
+#define SHORTEST_PATH         '*'
 
 using namespace std;
 
@@ -14,6 +14,7 @@ struct cell{
     int x;
     int y;
     unsigned int time=0;
+    int priority_order[4];
 };
 
 class bfs_tree{
@@ -24,7 +25,7 @@ public:
         this->Y = Y;
         this->start = start;
         this->destination = destination;
-        map[ start.y ][start.x] = SALESMAN_1_TRAIL;
+        map[ start.y ][ start.x ] = SALESMAN_1_TRAIL;
         map[ destination.y ][ destination.x ] = SALESMAN_2_TRAIL;
 
         map_of_parents = new int* [Y];
@@ -38,6 +39,8 @@ public:
             }
         }
     }
+
+    
 
     void optimized_bfs(){
 
@@ -73,6 +76,7 @@ public:
 
         }
 
+        cout << endl;
         for (int i=0; i<Y; i++){
 			for (int j=0; j<X; j++){
 				cout << map[i][j] << " ";
@@ -98,7 +102,7 @@ public:
             if ( map_of_parents[q][p] == 0 ){
                 break;
             }else{
-                map[q][p] = 8;
+                map[q][p] = SHORTEST_PATH;
                 if ( map_of_parents[q][p] == 1 ){
                     q = q-1;
                 }else if ( map_of_parents[q][p] == 2 ){
@@ -224,12 +228,13 @@ int main(){
 		}
 	}
 	
-	for (int i=0; i<N; i++){
-		for (int j=0; j<M; j++){
-			cout << map[i][j] << " ";
-		}
-		cout << endl;
-	}
+    //print input map
+	// for (int i=0; i<N; i++){
+	// 	for (int j=0; j<M; j++){
+	// 		cout << map[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
 	
     cell rob1;
     rob1.x = 0;
